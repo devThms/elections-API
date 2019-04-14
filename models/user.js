@@ -8,9 +8,9 @@ let rolesValidator = {
     message: '{VALUE}, no es un rol permitido'
 };
 
-let usuarioSchema = new Schema({
+let userSchema = new Schema({
 
-    nombre: {
+    name: {
         type: String,
         required: [true, 'El nombre es obligatorio']
     },
@@ -33,13 +33,13 @@ let usuarioSchema = new Schema({
         default: 'USER_ROLE',
         enum: rolesValidator
     },
-    estado: {
+    status: {
         type: Boolean,
         default: true
     }
 
 });
 
-usuarioSchema.plugin(uniqueValidator, { message: '{PATH}, debe ser único' });
+userSchema.plugin(uniqueValidator, { message: '{PATH}, debe ser único' });
 
-module.exports = mongoose.model('Usuario', usuarioSchema);
+module.exports = mongoose.model('User', userSchema);

@@ -1,4 +1,5 @@
 // Requires
+require('./config/config');
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -11,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Conexion a la base de datos
-mongoose.connection.openUri('mongodb://localhost:27017/electionsDB', { useNewUrlParser: true }, (err, res) => {
+mongoose.connection.openUri(process.env.UrlDB, { useNewUrlParser: true }, (err, res) => {
 
     if (err) throw err;
 
@@ -23,6 +24,6 @@ app.use(require('./routes/routes'));
 
 
 // Escuchando servicios
-app.listen(3000, () => {
-    console.log('Express server port 3000 online');
+app.listen(process.env.PORT, () => {
+    console.log(`Express server port ${ process.env.PORT } online`);
 });

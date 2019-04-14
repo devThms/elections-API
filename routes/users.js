@@ -5,15 +5,20 @@ const app = express();
 
 let mdAuth = require('../middlewares/autenticacion');
 
-let Usuario = require('../models/usuario');
+let User = require('../models/user');
 
 // =======================================
 // Obtener usuarios
 // =======================================
 app.get('/usuarios', (req, res) => {
 
-    Usuario.find({ estado: true }, 'nombre email img role estado')
-        .exec((err, usuarios) => {
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    User.find({ status: true }, 'name email img role status')
+        .skip(desde)
+        .limit(5)
+        .exec((err, users) => {
 
             if (err) {
                 return res.status(500).json({
@@ -23,10 +28,16 @@ app.get('/usuarios', (req, res) => {
                 });
             }
 
-            res.status(200).json({
-                ok: true,
-                usuarios
+            User.count({ status: true }, (err, cont) => {
+
+                res.status(200).json({
+                    ok: true,
+                    users,
+                    total: cont
+                });
+
             });
+
 
         })
 });
@@ -39,15 +50,15 @@ app.post('/usuarios', mdAuth.verificaToken, (req, res) => {
 
     let body = req.body;
 
-    let usuario = new Usuario({
-        nombre: body.nombre,
+    let user = new User({
+        name: body.name,
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
         img: body.img,
         role: body.role
     });
 
-    usuario.save((err, usuarioDB) => {
+    user.save((err, userDB) => {
 
         if (err) {
             return res.status(400).json({
@@ -59,8 +70,8 @@ app.post('/usuarios', mdAuth.verificaToken, (req, res) => {
 
         res.status(201).json({
             ok: true,
-            usuario: usuarioDB,
-            usuarioAuth: req.usuario
+            user: userDB,
+            userAuth: req.user
         });
 
     });
@@ -75,7 +86,7 @@ app.put('/usuarios/:id', mdAuth.verificaToken, (req, res) => {
     let id = req.params.id;
     let body = req.body;
 
-    Usuario.findById(id, (err, usuario) => {
+    User.findById(id, (err, user) => {
 
         if (err) {
             return res.status(500).json({
@@ -85,18 +96,18 @@ app.put('/usuarios/:id', mdAuth.verificaToken, (req, res) => {
             });
         }
 
-        if (!usuario) {
+        if (!user) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'El usuario con el id ' + id + ' no existe'
             });
         }
 
-        usuario.nombre = body.nombre;
-        usuario.email = body.email;
-        usuario.role = body.role;
+        user.name = body.name;
+        user.email = body.email;
+        user.role = body.role;
 
-        usuario.save((err, usuarioDB) => {
+        user.save((err, userDB) => {
 
             if (err) {
                 return res.status(400).json({
@@ -108,8 +119,8 @@ app.put('/usuarios/:id', mdAuth.verificaToken, (req, res) => {
 
             res.status(200).json({
                 ok: true,
-                usuario: usuarioDB,
-                usuarioAuth: req.usuario
+                user: userDB,
+                userAuth: req.user
             });
 
         });
@@ -125,10 +136,10 @@ app.delete('/usuarios/:id', mdAuth.verificaToken, (req, res) => {
     let id = req.params.id;
 
     let deleted = {
-        estado: false
+        status: false
     };
 
-    Usuario.findByIdAndUpdate(id, deleted, { new: true }, (err, usuarioDB) => {
+    User.findByIdAndUpdate(id, deleted, { new: true }, (err, userDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -138,7 +149,7 @@ app.delete('/usuarios/:id', mdAuth.verificaToken, (req, res) => {
             });
         }
 
-        if (!usuarioDB) {
+        if (!userDB) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Usuario no encontrado'
@@ -147,8 +158,8 @@ app.delete('/usuarios/:id', mdAuth.verificaToken, (req, res) => {
 
         res.status(200).json({
             ok: true,
-            usuario: usuarioDB,
-            usuarioAuth: req.usuario
+            user: userDB,
+            userAuth: req.user
         });
 
     });

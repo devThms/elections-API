@@ -6,7 +6,7 @@ let SEED = require('../config/config').SEED;
 
 const app = express();
 
-let Usuario = require('../models/usuario');
+let User = require('../models/user');
 
 // ========================================
 // Login de Usuarios
@@ -15,7 +15,7 @@ app.post('/login', (req, res) => {
 
     let body = req.body;
 
-    Usuario.findOne({ email: body.email }, (err, usuarioDB) => {
+    User.findOne({ email: body.email }, (err, userDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -25,7 +25,7 @@ app.post('/login', (req, res) => {
             });
         }
 
-        if (!usuarioDB) {
+        if (!userDB) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Credenciales incorrectas - email',
@@ -33,7 +33,7 @@ app.post('/login', (req, res) => {
             });
         }
 
-        if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
+        if (!bcrypt.compareSync(body.password, userDB.password)) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Credenciales incorrectas - password',
@@ -42,13 +42,13 @@ app.post('/login', (req, res) => {
         }
 
         // Generación de JWT
-        let token = jwt.sign({ usuario: usuarioDB }, SEED, { expiresIn: 14400 }); // 4 Horas de vigencia Token
+        let token = jwt.sign({ user: userDB }, SEED, { expiresIn: 14400 }); // 4 Horas de vigencia Token
 
         res.status(200).json({
             ok: true,
-            usuario: usuarioDB,
+            user: userDB,
             token,
-            id: usuarioDB._id
+            id: userDB._id
         });
 
     });
