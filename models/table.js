@@ -20,6 +20,10 @@ let tableSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Center',
         required: [true, 'El Centro de votación es obligatorio']
+    },
+    is_closed: {
+        type: Boolean,
+        default: false
     }
 
 }, { collection: 'tables' });

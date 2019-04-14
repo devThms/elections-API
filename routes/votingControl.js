@@ -17,6 +17,11 @@ app.get('/controlVotos', (req, res) => {
     Control.find({ status: true })
         .skip(desde)
         .limit(5)
+        .populate('user', 'name')
+        .populate('candidate', 'firstName lastName address phone')
+        .populate('table', 'localNumber nationalNumber')
+        .populate('profile', 'name')
+        .populate('political', 'name address phone')
         .exec((err, controls) => {
 
             if (err) {
@@ -140,7 +145,7 @@ app.delete('/controlVotos/:id', mdAuth.verificaToken, (req, res) => {
     let id = req.params.id;
 
     let deleted = {
-        is_closed: true
+        status: false
     };
 
     Control.findByIdAndUpdate(id, deleted, { new: true }, (err, controlDB) => {

@@ -10,7 +10,7 @@ let profileSchema = new Schema({
     },
     summary: {
         type: String,
-        required: [true, 'El extraco es obligatorio']
+        required: false
     },
     status: {
         type: Boolean,

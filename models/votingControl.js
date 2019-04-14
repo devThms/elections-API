@@ -5,7 +5,7 @@ let Schema = mongoose.Schema;
 let controlSchema = new Schema({
 
     time: {
-        type: Date,
+        type: String,
         required: [true, 'El tiempo es obligatorio']
     },
     date: {
@@ -15,7 +15,7 @@ let controlSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
-        required: [true, 'El usuario es requerido']
+        required: [true, 'El usuario es obligatorio']
     },
     candidate: {
         type: Schema.Types.ObjectId,
@@ -41,9 +41,9 @@ let controlSchema = new Schema({
         type: Number,
         required: [true, 'La cantidad es obligatoria']
     },
-    is_closed: {
+    status: {
         type: Boolean,
-        default: false
+        default: true
     }
 
 }, { collection: 'votingControls' });
