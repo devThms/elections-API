@@ -4,23 +4,23 @@
 module.exports.SEED = 'seed-secret';
 
 // ===============================
-// Puerto
+// Configuracion Puerto
 // ===============================
 process.env.PORT = process.env.PORT || 3000;
 
 // ===============================
-// Entorno
+// Configuracion Entorno
 // ===============================
-process.env.NODE_DEV = process.env.NODE_DEV || 'dev';
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 
 // ===============================
-// Base de Datos
+// Configuracion Base de Datos
 // ===============================
 let urlDB;
 
 if (process.env.NODE_ENV === 'dev') {
     urlDB = 'mongodb://localhost:27017/electionsDB';
 } else {
-    urlDB = 'mongodb://admin-user:admin123.@ds239936.mlab.com:39936/elections-db';
+    urlDB = process.env.MONGO_URL;
 }
 process.env.UrlDB = urlDB;
