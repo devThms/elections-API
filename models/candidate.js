@@ -20,6 +20,10 @@ let candidateSchema = new Schema({
         type: String,
         required: [true, 'Es requerido indicar su fundacion']
     },
+    img: {
+        type: String,
+        required: false
+    },
     status: {
         type: Boolean,
         default: true

@@ -12,5 +12,7 @@ app.use(require('./table'));
 app.use(require('./rangeTable'));
 app.use(require('./politicalProfile'));
 app.use(require('./votingControl'));
+app.use(require('./upload'));
+app.use(require('./images'));
 
 module.exports = app;
