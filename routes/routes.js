@@ -14,5 +14,6 @@ app.use(require('./politicalProfile'));
 app.use(require('./votingControl'));
 app.use(require('./upload'));
 app.use(require('./images'));
+app.use(require('./busqueda'));
 
 module.exports = app;
