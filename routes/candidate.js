@@ -18,6 +18,7 @@ app.get('/candidatos', (req, res) => {
         .skip(desde)
         .limit(5)
         .populate('political', 'name address phone foundation')
+        .populate('profile', 'name summary')
         .populate('period', 'period dateVoting')
         .exec((err, candidates) => {
 
@@ -42,6 +43,38 @@ app.get('/candidatos', (req, res) => {
         })
 });
 
+// =======================================
+// Buscar Candidatos politicos por ID
+// =======================================
+app.get('/candidatos/:id', (req, res) => {
+
+    let id = req.params.id;
+
+    Candidate.findById(id, (err, candidateDB) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar un candidato politico',
+                err
+            });
+        }
+
+        if (!candidateDB) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Candidato politico no encontrado'
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            candidate: candidateDB
+        });
+
+    });
+
+});
 
 // =======================================
 // Crear Candidatos
@@ -56,6 +89,7 @@ app.post('/candidatos', mdAuth.verificaToken, (req, res) => {
         address: body.address,
         phone: body.phone,
         political: body.political,
+        profile: body.profile,
         period: body.period
     });
 
@@ -108,6 +142,7 @@ app.put('/candidatos/:id', mdAuth.verificaToken, (req, res) => {
         candidate.address = body.address;
         candidate.phone = body.phone;
         candidate.political = body.political;
+        candidate.profile = body.profile;
         candidate.period = body.period;
 
         candidate.save((err, candidateDB) => {

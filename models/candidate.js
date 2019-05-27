@@ -33,6 +33,11 @@ let candidateSchema = new Schema({
         ref: 'Political',
         required: [true, 'El Partido politico es obligatorio']
     },
+    profile: {
+        type: Schema.Types.ObjectId,
+        ref: 'Profile',
+        required: [true, 'El Perfil politico es obligatorio']
+    },
     period: {
         type: Schema.Types.ObjectId,
         ref: 'Period',

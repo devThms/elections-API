@@ -41,6 +41,39 @@ app.get('/partidos', (req, res) => {
         })
 });
 
+// =======================================
+// Buscar Partidos politicos por ID
+// =======================================
+app.get('/partidos/:id', (req, res) => {
+
+    let id = req.params.id;
+
+    Political.findById(id, (err, politicalDB) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar un partido politico',
+                err
+            });
+        }
+
+        if (!politicalDB) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Partido politico no encontrado'
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            political: politicalDB
+        });
+
+    });
+
+});
+
 
 // =======================================
 // Crear Partidos Politicos

@@ -41,6 +41,38 @@ app.get('/perfiles', (req, res) => {
         })
 });
 
+// =======================================
+// Buscar Perfiles politicos por ID
+// =======================================
+app.get('/perfiles/:id', (req, res) => {
+
+    let id = req.params.id;
+
+    Profile.findById(id, (err, profileDB) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar un perfil politico',
+                err
+            });
+        }
+
+        if (!profileDB) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Perfil politico no encontrado'
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            profile: profileDB
+        });
+
+    });
+
+});
 
 // =======================================
 // Crear Perfiles Politicos
