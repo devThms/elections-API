@@ -6,7 +6,7 @@ module.exports.SEED = 'seed-secret';
 // ===============================
 // Configuracion Puerto
 // ===============================
-process.env.PORT = process.env.PORT || 3000;
+process.env.PORT = process.env.PORT || 80;
 
 // ===============================
 // Configuracion Entorno
