@@ -40,6 +40,39 @@ app.get('/centros', (req, res) => {
         })
 });
 
+// =======================================
+// Buscar Centros por ID
+// =======================================
+app.get('/centros/:id', (req, res) => {
+
+    let id = req.params.id;
+
+    Center.findById(id)
+        .exec((err, centerDB) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar un centro de votación',
+                    err
+                });
+            }
+
+            if (!centerDB) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Centro de Votación no encontrado'
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                center: centerDB
+            });
+
+        });
+
+});
 
 // =======================================
 // Crear Centros de Votacion

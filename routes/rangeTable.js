@@ -41,6 +41,40 @@ app.get('/rangos', (req, res) => {
         })
 });
 
+// =======================================
+// Obtener Rangos de Mesas por ID
+// =======================================
+app.get('/rangos/:id', (req, res) => {
+
+    let id = req.params.id;
+
+    Range.findOne({ center: id, status: true })
+        .populate('center', 'name ubication qtyTables')
+        .exec((err, rangeDB) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar un rango de mesas',
+                    err
+                });
+            }
+
+            if (!rangeDB) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Rango de mesas no encontrado'
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                range: rangeDB
+            });
+
+        });
+
+});
 
 // =======================================
 // Crear Rangos de mesas de votacion

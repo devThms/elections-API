@@ -9,6 +9,7 @@ let Political = require('../models/politicalParty');
 let Profile = require('../models/politicalProfile');
 let User = require('../models/user');
 let Center = require('../models/votingCenter');
+let Table = require('../models/table');
 
 // =======================================
 // Busqueda por colección
@@ -43,10 +44,14 @@ app.get('/busqueda/coleccion/:tabla/:termino', (req, res) => {
             promesa = buscarCentros(regEx);
             break;
 
+        case 'mesas':
+            promesa = buscarMesas(termino);
+            break;
+
         default:
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Los tipos de busqueda son: candidatos, partidos, perfiles, usuarios, centros',
+                mensaje: 'Los tipos de busqueda son: candidatos, partidos, perfiles, usuarios, centros, mesas',
                 error: { message: 'Tipo de coleccion no valida' }
             });
     }
@@ -75,7 +80,8 @@ app.get('/busqueda/todo/:termino', (req, res) => {
         buscarPartidos(regEx),
         buscarPerfiles(regEx),
         buscarUsuarios(regEx),
-        buscarCentros(regEx)
+        buscarCentros(regEx),
+        buscarMesas(regEx)
     ]).then(respuestas => {
 
         res.status(200).json({
@@ -84,7 +90,8 @@ app.get('/busqueda/todo/:termino', (req, res) => {
             partidos: respuestas[1],
             perfiles: respuestas[2],
             usuarios: respuestas[3],
-            centros: respuestas[4]
+            centros: respuestas[4],
+            mesas: respuestas[5]
         });
 
     });
@@ -96,8 +103,9 @@ function buscarCandidatos(regEx) {
     return new Promise((resolve, reject) => {
 
         Candidate.find({ status: true })
-            .or([{ 'firstName': regEx }, { 'lastName': regEx }])
+            .or([{ 'firstName': regEx }, { 'lastName': regEx }, { 'profile.name': regEx }])
             .populate('political', 'name address phone foundation')
+            .populate('profile', 'name summary')
             .populate('period', 'period dateVoting')
             .exec((err, candidatos) => {
 
@@ -178,6 +186,26 @@ function buscarCentros(regEx) {
             }
 
         });
+
+    });
+}
+
+function buscarMesas(termino) {
+
+    return new Promise((resolve, reject) => {
+
+        Table.find({ status: true })
+            .or([{ 'localNumber': termino }, { 'nationalNumber': termino }])
+            .populate('center', 'name ubication qtyTables')
+            .exec((err, mesas) => {
+
+                if (err) {
+                    reject('Error al cargar mesas de votacion', err);
+                } else {
+                    resolve(mesas);
+                }
+
+            });
 
     });
 }

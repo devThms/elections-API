@@ -12,11 +12,13 @@ let Political = require('../models/politicalParty');
 app.get('/partidos', (req, res) => {
 
     let desde = req.query.desde || 0;
+    let limit = req.query.limit || 5;
     desde = Number(desde);
+    limit = Number(limit);
 
     Political.find({ status: true })
         .skip(desde)
-        .limit(5)
+        .limit(limit)
         .exec((err, politicals) => {
 
             if (err) {

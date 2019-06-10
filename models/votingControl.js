@@ -17,11 +17,6 @@ let controlSchema = new Schema({
         ref: 'User',
         required: [true, 'El usuario es obligatorio']
     },
-    candidate: {
-        type: Schema.Types.ObjectId,
-        ref: 'Candidate',
-        required: [true, 'El Candidato es obligatorio']
-    },
     table: {
         type: Schema.Types.ObjectId,
         ref: 'Table',

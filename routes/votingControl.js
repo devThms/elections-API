@@ -6,19 +6,21 @@ let mdAuth = require('../middlewares/autenticacion');
 
 let Control = require('../models/votingControl');
 
-// =======================================
-// Obtener Control de Votos
-// =======================================
-app.get('/controlVotos', (req, res) => {
+let Profile = require('../models/politicalProfile');
+
+// ==============================================
+// Obtener Control de Votos por Mesa de Votación
+// ==============================================
+app.get('/controlVotos/:mesaId/:profileId', (req, res) => {
 
     let desde = req.query.desde || 0;
+    let mesaId = req.params.mesaId;
+    let profileId = req.params.profileId;
     desde = Number(desde);
 
-    Control.find({ status: true })
+    Control.find({ table: mesaId, profile: profileId, status: true })
         .skip(desde)
-        .limit(5)
         .populate('user', 'name')
-        .populate('candidate', 'firstName lastName address phone')
         .populate('table', 'localNumber nationalNumber')
         .populate('profile', 'name')
         .populate('political', 'name address phone')
@@ -32,7 +34,7 @@ app.get('/controlVotos', (req, res) => {
                 });
             }
 
-            Control.count({ status: true }, (err, cont) => {
+            Control.count({ table: mesaId, profile: profileId, status: true }, (err, cont) => {
 
                 res.status(200).json({
                     ok: true,
@@ -43,6 +45,63 @@ app.get('/controlVotos', (req, res) => {
             });
 
         })
+});
+
+// ==============================================================================
+// Obtener Control de Votos por Perfil Politico y Centro de Votación -- Dashboard
+// ==============================================================================
+app.get('/control-votos/:profileId', (req, res) => {
+
+    let id = req.params.profileId;
+
+    Profile.findById(id, (err, profileDB) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error al buscar un perfil politico',
+                err
+            });
+        }
+
+        Control.aggregate([{
+                $match: { profile: profileDB._id }
+            },
+            {
+                $group: {
+                    _id: { political: "$political", profile: "$profile" },
+                    totalVotos: { $sum: "$amount" },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: "politicalParties",
+                    localField: "_id.political",
+                    foreignField: "_id",
+                    as: "partidos"
+                }
+            }
+        ]).exec((err, controls) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error carga de controles de votacion',
+                    err
+                });
+            } else {
+                return res.status(200).json({
+                    ok: true,
+                    votosRegistrados: controls
+                });
+            }
+        });
+
+
+    });
+
+
+
 });
 
 
@@ -57,7 +116,6 @@ app.post('/controlVotos', mdAuth.verificaToken, (req, res) => {
         time: body.time,
         date: body.date,
         user: body.user,
-        candidate: body.candidate,
         table: body.table,
         profile: body.profile,
         political: body.political,
@@ -78,6 +136,8 @@ app.post('/controlVotos', mdAuth.verificaToken, (req, res) => {
             ok: true,
             control: controlDB
         });
+
+
 
     });
 
@@ -111,7 +171,6 @@ app.put('/controlVotos/:id', mdAuth.verificaToken, (req, res) => {
         control.time = body.time;
         control.date = body.date;
         control.user = body.user;
-        control.candidate = body.candidate;
         control.table = body.table;
         control.profile = body.profile;
         control.political = body.political;
@@ -138,7 +197,7 @@ app.put('/controlVotos/:id', mdAuth.verificaToken, (req, res) => {
 });
 
 // =======================================
-// Cerrar un Control de Votos
+// Borrar un Control de Votos
 // =======================================
 app.delete('/controlVotos/:id', mdAuth.verificaToken, (req, res) => {
 

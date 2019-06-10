@@ -17,7 +17,7 @@ app.get('/candidatos', (req, res) => {
     Candidate.find({ status: true })
         .skip(desde)
         .limit(5)
-        .populate('political', 'name address phone foundation')
+        .populate('political', 'name address phone foundation logotype')
         .populate('profile', 'name summary')
         .populate('period', 'period dateVoting')
         .exec((err, candidates) => {
@@ -50,29 +50,33 @@ app.get('/candidatos/:id', (req, res) => {
 
     let id = req.params.id;
 
-    Candidate.findById(id, (err, candidateDB) => {
+    Candidate.findById(id)
+        .populate('political', 'name address phone foundation logotype')
+        .populate('profile', 'name summary')
+        .populate('period', 'period dateVoting')
+        .exec((err, candidateDB) => {
 
-        if (err) {
-            return res.status(500).json({
-                ok: false,
-                mensaje: 'Error al buscar un candidato politico',
-                err
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar un candidato politico',
+                    err
+                });
+            }
+
+            if (!candidateDB) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'Candidato politico no encontrado'
+                });
+            }
+
+            res.status(200).json({
+                ok: true,
+                candidate: candidateDB
             });
-        }
 
-        if (!candidateDB) {
-            return res.status(400).json({
-                ok: false,
-                mensaje: 'Candidato politico no encontrado'
-            });
-        }
-
-        res.status(200).json({
-            ok: true,
-            candidate: candidateDB
         });
-
-    });
 
 });
 

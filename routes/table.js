@@ -9,12 +9,13 @@ let Table = require('../models/table');
 // =======================================
 // Obtener Mesas de Votacion
 // =======================================
-app.get('/mesas', (req, res) => {
+app.get('/mesas/:id', (req, res) => {
 
     let desde = req.query.desde || 0;
+    let id = req.params.id;
     desde = Number(desde);
 
-    Table.find({ status: true })
+    Table.find({ center: id, status: true })
         .skip(desde)
         .limit(5)
         .populate('center', 'name ubication')
@@ -28,7 +29,7 @@ app.get('/mesas', (req, res) => {
                 });
             }
 
-            Table.count({ status: true }, (err, cont) => {
+            Table.count({ center: id, status: true }, (err, cont) => {
 
                 res.status(200).json({
                     ok: true,
@@ -52,7 +53,8 @@ app.post('/mesas', mdAuth.verificaToken, (req, res) => {
     let table = new Table({
         localNumber: body.localNumber,
         nationalNumber: body.nationalNumber,
-        center: body.center
+        center: body.center,
+        is_closed: false
     });
 
     table.save((err, tableDB) => {
@@ -102,6 +104,7 @@ app.put('/mesas/:id', mdAuth.verificaToken, (req, res) => {
         table.localNumber = body.localNumber;
         table.nationalNumber = body.nationalNumber;
         table.center = body.center;
+        table.is_closed = body.is_closed;
 
         table.save((err, tableDB) => {
 
@@ -122,6 +125,7 @@ app.put('/mesas/:id', mdAuth.verificaToken, (req, res) => {
     });
 
 });
+
 
 // =======================================
 // Eliminar Mesas de Votacion
