@@ -16,4 +16,12 @@ app.use(require('./upload'));
 app.use(require('./images'));
 app.use(require('./busqueda'));
 
+app.get('/', (req, res) => {
+
+    res.status(200).json({
+        ok: true,
+        mensaje: 'Aplicación servida en puerto 3000'
+    });
+});
+
 module.exports = app;
