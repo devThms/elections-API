@@ -1,4 +1,5 @@
-// Requires
+#!/usr/bin/env nodejs
+ // Requires
 require('./config/config');
 const express = require('express');
 const mongoose = require('mongoose');
