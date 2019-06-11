@@ -32,6 +32,11 @@ let controlSchema = new Schema({
         ref: 'Political',
         required: [true, 'El partido politico es obligatorio']
     },
+    center: {
+        type: Schema.Types.ObjectId,
+        ref: 'Center',
+        required: [true, 'El centro de votación es obligatorio']
+    },
     amount: {
         type: Number,
         required: [true, 'La cantidad es obligatoria']

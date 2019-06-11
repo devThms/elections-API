@@ -8,6 +8,8 @@ let Control = require('../models/votingControl');
 
 let Profile = require('../models/politicalProfile');
 
+let Center = require('../models/votingCenter');
+
 // ==============================================
 // Obtener Control de Votos por Mesa de Votación
 // ==============================================
@@ -24,6 +26,7 @@ app.get('/controlVotos/:mesaId/:profileId', (req, res) => {
         .populate('table', 'localNumber nationalNumber')
         .populate('profile', 'name')
         .populate('political', 'name address phone')
+        .populate('center', 'name ubication qtyTables')
         .exec((err, controls) => {
 
             if (err) {
@@ -50,16 +53,89 @@ app.get('/controlVotos/:mesaId/:profileId', (req, res) => {
 // ==============================================================================
 // Obtener Control de Votos por Perfil Politico y Centro de Votación -- Dashboard
 // ==============================================================================
-app.get('/control-votos/:profileId', (req, res) => {
+app.get('/control-votos/:profileId/:centerId', (req, res) => {
 
-    let id = req.params.profileId;
+    let profileId = req.params.profileId;
+    let centerId = req.params.centerId;
 
-    Profile.findById(id, (err, profileDB) => {
+    Profile.findById(profileId, (err, profileDB) => {
 
         if (err) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al buscar un perfil politico',
+                mensaje: 'Error debe seleccionar primero un perfil valido',
+                err
+            });
+        }
+
+        Center.findById(centerId, (err, centerDB) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    mensaje: 'Error al buscar un centro de votación valido',
+                    err
+                });
+            }
+
+            Control.aggregate([{
+                    $match: { $and: [{ profile: profileDB._id }, { center: centerDB._id }] }
+                },
+                {
+                    $group: {
+                        _id: { political: "$political", profile: "$profile", center: "$center" },
+                        totalVotos: { $sum: "$amount" },
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "politicalParties",
+                        localField: "_id.political",
+                        foreignField: "_id",
+                        as: "partidos"
+                    }
+                }
+            ]).exec((err, controls) => {
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error carga de controles de votacion',
+                        err
+                    });
+                } else {
+                    return res.status(200).json({
+                        ok: true,
+                        votosRegistrados: controls
+                    });
+                }
+            });
+
+
+        });
+
+
+
+    });
+
+
+
+});
+
+
+// ==============================================================================
+// Obtener Control de Votos por Perfil Politico -- Dashboard
+// ==============================================================================
+app.get('/control-votos/:profileId', (req, res) => {
+
+    let profileId = req.params.profileId;
+
+    Profile.findById(profileId, (err, profileDB) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error debe seleccionar primero un perfil valido',
                 err
             });
         }
@@ -119,6 +195,7 @@ app.post('/controlVotos', mdAuth.verificaToken, (req, res) => {
         table: body.table,
         profile: body.profile,
         political: body.political,
+        center: body.center,
         amount: body.amount
     });
 
@@ -174,6 +251,7 @@ app.put('/controlVotos/:id', mdAuth.verificaToken, (req, res) => {
         control.table = body.table;
         control.profile = body.profile;
         control.political = body.political;
+        control.center = body.center;
         control.amount = body.amount;
 
         control.save((err, controlDB) => {
