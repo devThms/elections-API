@@ -41,6 +41,8 @@ app.post('/login', (req, res) => {
             });
         }
 
+        userDB.password = ';)';
+
         // Generación de JWT
         let token = jwt.sign({ user: userDB }, SEED, { expiresIn: 14400 }); // 4 Horas de vigencia Token
 
@@ -48,7 +50,8 @@ app.post('/login', (req, res) => {
             ok: true,
             user: userDB,
             token,
-            id: userDB._id
+            id: userDB._id,
+            menu: obtenerMenu(userDB.role)
         });
 
     });
@@ -56,5 +59,54 @@ app.post('/login', (req, res) => {
 
 
 });
+
+function obtenerMenu(ROLE) {
+
+    if (ROLE === 'ADMIN_ROLE') {
+
+        let menuAdmin = [{
+                titulo: 'Administracion',
+                icono: 'mdi mdi-clipboard-text',
+                submenu: [
+                    { titulo: 'Usuarios', url: '/usuarios', icono: 'mdi mdi-account-box' }
+                ]
+            },
+            {
+                titulo: 'Mantenimientos',
+                icono: 'mdi mdi-archive',
+                submenu: [
+                    { titulo: 'Perfil Politico', url: '/perfiles', icono: 'mdi mdi-account-card-details' },
+                    { titulo: 'Periodo', url: '/periodos', icono: 'mdi mdi-timer-sand' },
+                    { titulo: 'Partido Politico', url: '/partidos', icono: 'mdi mdi-cards-outline' },
+                    { titulo: 'Candidatos', url: '/candidatos', icono: 'mdi mdi-account-multiple' },
+                    { titulo: 'Centros de Votación', url: '/centros', icono: 'mdi mdi-bank' }
+                ]
+            },
+            {
+                titulo: 'Operaciones',
+                icono: 'mdi mdi-book-open-page-variant',
+                submenu: [
+                    { titulo: 'Registro Votación', url: '/centros-votacion', icono: 'mdi mdi-fingerprint' }
+                ]
+            }
+        ];
+
+        return menuAdmin;
+
+    } else {
+
+        let menuOperator = [{
+            titulo: 'Operaciones',
+            icono: 'mdi mdi-book-open-page-variant',
+            submenu: [
+                { titulo: 'Registro Votación', url: '/centros-votacion', icono: 'mdi mdi-fingerprint' }
+            ]
+        }];
+
+        return menuOperator;
+
+    }
+
+}
 
 module.exports = app;

@@ -2,15 +2,23 @@ const mongoose = require('mongoose');
 
 let Schema = mongoose.Schema;
 
-let controlSchema = new Schema({
+let totalVotesSchema = new Schema({
 
-    time: {
-        type: String,
-        required: [true, 'El tiempo es obligatorio']
+    validVotes: {
+        type: Number,
+        required: [true, 'El total de votos validos es obligatorio']
     },
-    date: {
-        type: String,
-        required: [true, 'La fecha es obligatoria']
+    nullVotes: {
+        type: Number,
+        required: [true, 'El total de votos nulos es obligatorio']
+    },
+    blankVotes: {
+        type: Number,
+        required: [true, 'El total de votos en blanco es obligatorio']
+    },
+    objectionVotes: {
+        type: Number,
+        required: [true, 'El total de votos impugnados es obligatorio']
     },
     user: {
         type: Schema.Types.ObjectId,
@@ -27,25 +35,16 @@ let controlSchema = new Schema({
         ref: 'Profile',
         required: [true, 'El perfil politico es obligatorio']
     },
-    political: {
-        type: Schema.Types.ObjectId,
-        ref: 'Political',
-        required: [true, 'El partido politico es obligatorio']
-    },
     center: {
         type: Schema.Types.ObjectId,
         ref: 'Center',
         required: [true, 'El centro de votación es obligatorio']
-    },
-    amount: {
-        type: Number,
-        required: [true, 'La cantidad es obligatoria']
     },
     status: {
         type: Boolean,
         default: true
     }
 
-}, { collection: 'votingControls' });
+}, { collection: 'votingTotal' });
 
-module.exports = mongoose.model('Control', controlSchema);
+module.exports = mongoose.model('totalVotes', totalVotesSchema);

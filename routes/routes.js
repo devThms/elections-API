@@ -12,6 +12,7 @@ app.use(require('./table'));
 app.use(require('./rangeTable'));
 app.use(require('./politicalProfile'));
 app.use(require('./votingControl'));
+app.use(require('./votingTotal'));
 app.use(require('./upload'));
 app.use(require('./images'));
 app.use(require('./busqueda'));
