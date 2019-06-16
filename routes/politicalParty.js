@@ -88,6 +88,7 @@ app.post('/partidos', mdAuth.verificaToken, (req, res) => {
         name: body.name,
         address: body.address,
         phone: body.phone,
+        color: body.color,
         foundation: body.foundation,
         logotype: body.logotype
     });
@@ -139,6 +140,7 @@ app.put('/partidos/:id', mdAuth.verificaToken, (req, res) => {
         political.name = body.name;
         political.address = body.address;
         political.phone = body.phone;
+        political.color = body.color;
         political.foundation = body.foundation;
 
         political.save((err, politicalDB) => {

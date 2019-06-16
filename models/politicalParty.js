@@ -20,6 +20,10 @@ let politicalSchema = new Schema({
         type: String,
         required: [true, 'Es requerido indicar su fundacion']
     },
+    color: {
+        type: String,
+        required: [true, 'Es requerido indicar el color hexadecimal del partido']
+    },
     logotype: {
         type: String,
         required: false
