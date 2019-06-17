@@ -13,10 +13,12 @@ app.get('/centros', (req, res) => {
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
+    let limite = req.query.limite || 5;
+    limite = Number(limite);
 
     Center.find({ status: true })
         .skip(desde)
-        .limit(5)
+        .limit(limite)
         .exec((err, centers) => {
 
             if (err) {
